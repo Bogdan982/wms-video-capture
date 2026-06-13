@@ -34,12 +34,10 @@ version = 1.0.0
 # version.regex = __version__ = ['"](.*)['"]
 # version.filename = %(source.dir)s/main.py
 
-# (str) Application entrypoint
-main.py = main.py
-
-# (list) List of requirements to install via pip
+# (str) Application versioning (method 2)
+# version.regex = __version__ = ['\"](.*)['\"]
 # Python-for-Android обязательные: python3, hostpython3, kivy
-requirements = python3,kivy==2.3.1,pyjnius,pysmb,requests,android
+requirements = python3,kivy==2.3.1
 
 # (str) Presplash of the application
 # presplash.filename = %(source.dir)s/data/presplash.png
