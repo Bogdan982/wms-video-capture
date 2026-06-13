@@ -88,8 +88,8 @@ class WmsVideoApp(App):
         # Проверяем Intent при старте
         self._setup_android_intent_handler()
 
-        # Всегда показываем ConfirmScreen
-        self.sm.current = 'confirm'
+        # Всегда показываем сплэш-экран
+        self.sm.current = 'splash'
 
         if self._task_id:
             Logger.info(f"WmsApp: получен task_id из CLI: {self._task_id}")
@@ -225,11 +225,8 @@ class WmsVideoApp(App):
         self.current_video_path = local_path
         Logger.info(f"WmsApp: видео сохранено: {local_path}")
 
-        # ── DIALOG: показать DoneScreen с вопросом о смене ID ──
+        # ── DoneScreen сам восстановит режим из app_status ──
         self.app_status = 'done'
-        done_screen = self.sm.get_screen('done')
-        if done_screen:
-            done_screen.show_id_change_dialog()
         self.sm.current = 'done'
         self.logger.info("TASK", "Ожидание решения пользователя по ID")
 
@@ -246,6 +243,14 @@ class WmsVideoApp(App):
 
         # Запускаем сканер
         Clock.schedule_once(lambda dt: self.qr.start_scan(), 0.5)
+
+    def on_scanner_unavailable(self):
+        """QR-сканер не найден на устройстве — показываем сообщение на ScanScreen."""
+        Logger.warning("WmsApp: QR-сканер недоступен")
+        self.logger.warning("QR", "QR-сканер не найден на устройстве")
+        scan_screen = self.sm.get_screen('scan')
+        if scan_screen:
+            scan_screen.show_scanner_unavailable()
 
     def on_scan_result(self, scanned_id: str):
         """
@@ -275,6 +280,40 @@ class WmsVideoApp(App):
         self.app_status = 'uploading'
         self.sm.current = 'upload'
         Clock.schedule_once(lambda dt: self._upload_video(self.current_video_path, scanned_id), 0.3)
+
+    # ═════════════════════════════════════════════
+    # РУЧНОЙ ВВОД ИДЕНТИФИКАТОРА
+    # ═════════════════════════════════════════════
+
+    def on_manual_id_entered(self, manual_id: str):
+        """
+        Пользователь ввёл ID вручную вместо сканирования.
+        Переименовываем файл и запускаем выгрузку с новым ID.
+        """
+        if not manual_id or not manual_id.strip():
+            Logger.warning("WmsApp: ручной ввод ID — пустая строка")
+            return
+
+        manual_id = manual_id.strip()
+        Logger.info(f"WmsApp: ручной ввод ID: {manual_id}")
+        self.logger.info("TASK", f"Ручной ввод ID: {manual_id}")
+
+        # Меняем ID задачи
+        self.current_task_id = manual_id
+
+        # Переименовываем локальный файл с новым ID
+        original_path = self.current_video_path
+        new_path = self.file_mgr.rename_with_id(original_path, manual_id)
+        if new_path:
+            self.current_video_path = new_path
+            Logger.info(f"WmsApp: файл переименован: {new_path}")
+
+        # Запускаем выгрузку
+        self.app_status = 'uploading'
+        self.sm.current = 'upload'
+        Clock.schedule_once(
+            lambda dt: self._upload_video(self.current_video_path, manual_id), 0.3
+        )
 
     # ═════════════════════════════════════════════
     # ВЫГРУЗКА

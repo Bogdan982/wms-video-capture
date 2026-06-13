@@ -104,30 +104,15 @@ class QRService:
             self._handle_no_scanner()
 
     def _handle_no_scanner(self):
-        """Если ZXing не установлен — пробуем альтернативы."""
-        Logger.info("QRService: ZXing не найден, пробуем Barcode Scanner+...")
-
-        # Пробуем Google GMS Barcode Scanner (ML Kit)
-        try:
-            intent = Intent('com.google.android.gms.vision.SCAN')
-            intent.putExtra('SCAN_MODE', 'QR_CODE_MODE')
-            PythonActivity.mActivity.startActivityForResult(
-                intent, SCAN_REQUEST_CODE
-            )
-            Logger.info("QRService: Google ML Kit сканер запущен")
-            return
-        except Exception:
-            pass
-
-        # Ничего не установлено — сообщаем пользователю
+        """Если ни один QR-сканер не найден."""
         Logger.error("QRService: ни один QR-сканер не найден")
         self._scanning = False
 
-        # Коллбэк с None (пользователь не сканировал)
+        # Уведомляем ScanScreen через App
         if self._app:
             from kivy.clock import Clock
             Clock.schedule_once(
-                lambda dt: self._app.on_scan_result(None), 0.3
+                lambda dt: self._app.on_scanner_unavailable(), 0.1
             )
 
     def on_activity_result(self, request_code: int, result_code: int, data):

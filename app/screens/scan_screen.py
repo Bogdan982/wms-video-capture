@@ -69,6 +69,15 @@ class ScanScreen(Screen):
     def on_enter(self):
         self.status_label.text = 'Ожидание QR-кода...'
         self.result_label.text = ''
+        self._scanned_id = None
+
+    def show_scanner_unavailable(self):
+        """QR-сканер не найден — показываем сообщение."""
+        self.status_label.text = '❌ QR-сканер не найден'
+        self.result_label.text = ('Установите ZXing Barcode Scanner\n'
+                                   'из Google Play или используйте\n'
+                                   'ручной ввод ID.')
+        Logger.warning("ScanScreen: сканер недоступен")
 
     def on_scan_result(self, scanned_text: str):
         if scanned_text:
