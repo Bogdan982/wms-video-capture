@@ -91,7 +91,7 @@ android.add_activity_meta_data = intent-filter:action=android.intent.action.VIEW
 # android.add_src =
 
 # (str) Path to a custom AndroidManifest.xml
-android.manifest = assets/AndroidManifest.xml
+# android.manifest = assets/AndroidManifest.xml
 
 # (bool) If True, then skip trying to update the Android SDK
 android.accept_sdk_license = True
@@ -109,4 +109,4 @@ log_max_size = 1000000
 # p4a.branch = develop
 
 # (str) What to build: debug or release
-android.release_artifact = aab
+# android.release_artifact = aab
