@@ -48,7 +48,7 @@ requirements = python3,kivy==2.3.1,pyjnius,pysmb,requests,android
 # icon.filename = %(source.dir)s/data/icon.png
 
 # (str) Supported orientation (one of: landscape, sensorLandscape, portrait, sensorPortrait, all)
-orientation = sensorPortrait
+orientation = portrait
 
 # (list) List of service to declare
 services = WmsUploadService:app/services/upload_service.py:foreground
