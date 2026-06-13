@@ -29,7 +29,7 @@ KV = """
             size_hint_y: 0.15
 
         Label:
-            text: 'Приложение запущено!\n(минимальный тест)'
+            text: 'App started!\\n(minimal test)'
             font_size: '18sp'
             halign: 'center'
             size_hint_y: 0.3
