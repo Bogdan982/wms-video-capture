@@ -35,7 +35,7 @@ version = 1.0.0
 # version.filename = %(source.dir)s/main.py
 
 # (str) Application entrypoint
-main.py = main.py
+main.py = main_minimal.py
 
 # (list) List of requirements to install via pip
 # Python-for-Android обязательные: python3, hostpython3, kivy
