@@ -31,31 +31,6 @@ except ImportError:
     _ANDROID = False
 
 
-def main():
-    """Точка входа."""
-    # Запрос разрешений на Android
-    if _ANDROID:
-        _request_permissions()
-
-    app = WmsVideoApp(task_id=_task_id)
-
-    if _ANDROID:
-        # Регистрируем единый обработчик ActivityResult
-        # который диспатчит по request_code
-        def on_activity_result(request_code, result_code, data):
-            if request_code == 1001:  # Camera
-                app.camera.on_activity_result(request_code, result_code, data)
-            elif request_code == 2001:  # QR Scanner
-                app.qr.on_activity_result(request_code, result_code, data)
-
-        activity.bind(on_activity_result=on_activity_result)
-
-    app.run()
-
-
-if __name__ == '__main__':
-    main()
-
 def _request_permissions():
     """Запрашивает разрешения: камера, микрофон, хранилище."""
     try:
@@ -72,3 +47,27 @@ def _request_permissions():
     except Exception as e:
         from kivy.logger import Logger
         Logger.warning(f"Permissions: {e}")
+
+
+def main():
+    """Точка входа."""
+    # Запрос разрешений на Android
+    if _ANDROID:
+        _request_permissions()
+
+    app = WmsVideoApp(task_id=_task_id)
+
+    if _ANDROID:
+        def on_activity_result(request_code, result_code, data):
+            if request_code == 1001:  # Camera
+                app.camera.on_activity_result(request_code, result_code, data)
+            elif request_code == 2001:  # QR Scanner
+                app.qr.on_activity_result(request_code, result_code, data)
+
+        activity.bind(on_activity_result=on_activity_result)
+
+    app.run()
+
+
+if __name__ == '__main__':
+    main()
