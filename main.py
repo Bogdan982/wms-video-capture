@@ -33,6 +33,10 @@ except ImportError:
 
 def main():
     """Точка входа."""
+    # Запрос разрешений на Android
+    if _ANDROID:
+        _request_permissions()
+
     app = WmsVideoApp(task_id=_task_id)
 
     if _ANDROID:
@@ -51,3 +55,20 @@ def main():
 
 if __name__ == '__main__':
     main()
+
+def _request_permissions():
+    """Запрашивает разрешения: камера, микрофон, хранилище."""
+    try:
+        from android.permissions import request_permissions, Permission, check_permission
+        needed = []
+        if not check_permission(Permission.CAMERA):
+            needed.append(Permission.CAMERA)
+        if not check_permission(Permission.RECORD_AUDIO):
+            needed.append(Permission.RECORD_AUDIO)
+        if not check_permission(Permission.WRITE_EXTERNAL_STORAGE):
+            needed.append(Permission.WRITE_EXTERNAL_STORAGE)
+        if needed:
+            request_permissions(needed)
+    except Exception as e:
+        from kivy.logger import Logger
+        Logger.warning(f"Permissions: {e}")
