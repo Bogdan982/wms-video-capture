@@ -16,13 +16,13 @@ source.dir = .
 source.include_exts = py,png,jpg,kv,atlas,ttf,json,xml
 
 # (list) List of inclusions using pattern matching
-source.include_patterns = assets/*,app/**/*,res/**/*
+# source.include_patterns = assets/*,app/**/*,res/**/*
 
 # (list) Source files to exclude (relative to source.dir)
-source.exclude_exts = spec,md
+# source.exclude_exts = spec,md
 
 # (list) List of directory to exclude from the conversion
-source.exclude_dirs = tests, bin
+# source.exclude_dirs = tests, bin
 
 # (list) List of git branches to ignore
 source.ignore_git_branches = develop,staging
@@ -49,7 +49,7 @@ requirements = python3,kivy==2.3.1
 orientation = portrait
 
 # (list) List of service to declare
-services = WmsUploadService:app/services/upload_service.py:foreground
+# services = WmsUploadService:app/services/upload_service.py:foreground
 
 # (bool) Full screen
 fullscreen = 1
