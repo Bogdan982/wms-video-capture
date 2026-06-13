@@ -88,8 +88,8 @@ class WmsVideoApp(App):
         # Проверяем Intent при старте
         self._setup_android_intent_handler()
 
-        # Всегда показываем сплэш-экран
-        self.sm.current = 'splash'
+        # Всегда показываем ConfirmScreen
+        self.sm.current = 'confirm'
 
         if self._task_id:
             Logger.info(f"WmsApp: получен task_id из CLI: {self._task_id}")

@@ -82,19 +82,16 @@ class SplashScreen(Screen):
         Clock.schedule_once(self._goto_main, 3.0)
 
     def _apply_gradient(self):
-        """Рисует градиентный фон: голубой → синий → чёрный."""
+        """Рисует фон."""
         with self.canvas.before:
-            Color(0.2, 0.6, 1.0, 1)  # top — голубой
-            self._rect_top = Rectangle(size=self.size, pos=self.pos)
-            Color(0.05, 0.1, 0.5, 1)  # middle — синий
-            # нижняя часть — чёрный
+            Color(0.05, 0.1, 0.3, 1)  # тёмно-синий
+            self._rect = Rectangle(size=self.size, pos=self.pos)
         self.bind(size=self._update_gradient, pos=self._update_gradient)
 
     def _update_gradient(self, *args):
-        """Обновляет размер градиента."""
-        if hasattr(self, '_rect_top'):
-            self._rect_top.size = self.size
-            self._rect_top.pos = self.pos
+        if hasattr(self, '_rect'):
+            self._rect.size = self.size
+            self._rect.pos = self.pos
 
     def _goto_main(self, dt):
         """Переход к ConfirmScreen."""
