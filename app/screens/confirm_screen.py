@@ -69,21 +69,30 @@ class ConfirmScreen(Screen):
 
     def _start(self, *args):
         Logger.info("ConfirmScreen: start recording")
-        app = self._get_app()
-        if app and app.current_task_id:
-            app.start_recording()
+        try:
+            app = self._get_app()
+            if app:
+                app.start_recording()
+        except Exception as e:
+            Logger.error(f"ConfirmScreen: _start error: {e}")
 
     def _start_qr(self, *args):
         Logger.info("ConfirmScreen: QR scan")
-        app = self._get_app()
-        if app:
-            app.on_scan_requested()
+        try:
+            app = self._get_app()
+            if app:
+                app.on_scan_requested()
+        except Exception as e:
+            Logger.error(f"ConfirmScreen: QR scan error: {e}")
 
     def _open_settings(self, *args):
         Logger.info("ConfirmScreen: open settings")
-        app = self._get_app()
-        if app:
-            app.open_settings()
+        try:
+            app = self._get_app()
+            if app:
+                app.open_settings()
+        except Exception as e:
+            Logger.error(f"ConfirmScreen: settings error: {e}")
 
     def _get_app(self):
         try:
