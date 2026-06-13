@@ -369,7 +369,5 @@ class SettingsScreen(Screen):
             app.sm.current = 'confirm' if app.current_task_id else 'confirm'
 
     def _get_app(self):
-        try:
-            return self.manager.parent
-        except Exception:
-            return None
+        from kivy.app import App
+        return App.get_running_app()

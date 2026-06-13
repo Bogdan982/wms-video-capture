@@ -170,7 +170,5 @@ class ScanScreen(Screen):
             app.on_use_current_id()
 
     def _get_app(self):
-        try:
-            return self.manager.parent
-        except Exception:
-            return None
+        from kivy.app import App
+        return App.get_running_app()

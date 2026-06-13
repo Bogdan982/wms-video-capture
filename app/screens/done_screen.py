@@ -319,7 +319,5 @@ class DoneScreen(Screen):
             app.on_request_close()
 
     def _get_app(self):
-        try:
-            return self.manager.parent
-        except Exception:
-            return None
+        from kivy.app import App
+        return App.get_running_app()
