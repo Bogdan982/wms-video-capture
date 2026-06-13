@@ -94,7 +94,8 @@ android.add_activity_meta_data = intent-filter:action=android.intent.action.VIEW
 android.manifest = assets/AndroidManifest.xml
 
 # (bool) If True, then skip trying to update the Android SDK
-# android.accept_sdk_license = False
+android.accept_sdk_license = True
+android.build_tools = 34.0.0
 
 # (str) Log level (debug, info, warning, error)
 log_level = 2
