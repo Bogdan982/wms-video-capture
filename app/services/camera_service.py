@@ -22,7 +22,11 @@ try:
     Uri = autoclass('android.net.Uri')
     Environment = autoclass('android.os.Environment')
     MediaStore = autoclass('android.provider.MediaStore')
-    FileProvider = autoclass('androidx.core.content.FileProvider')
+    try:
+        FileProvider = autoclass('androidx.core.content.FileProvider')
+    except Exception:
+        FileProvider = None
+        Logger.warning("FileProvider not available (AndroidX missing)")
     File = autoclass('java.io.File')
     Activity = autoclass('android.app.Activity')
     PythonActivity = autoclass('org.kivy.android.PythonActivity')
