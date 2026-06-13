@@ -18,8 +18,6 @@ kivy.require('2.2.0')
 from kivy.config import Config
 Config.set('kivy', 'log_level', 'info')
 Config.set('graphics', 'resizable', False)
-Config.set('graphics', 'width', '480')
-Config.set('graphics', 'height', '800')
 
 from app.app import WmsVideoApp
 
