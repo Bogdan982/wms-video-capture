@@ -40,6 +40,7 @@ from app.screens.upload_screen import UploadScreen
 from app.screens.done_screen import DoneScreen
 from app.screens.scan_screen import ScanScreen
 from app.screens.settings_screen import SettingsScreen
+from app.screens.splash_screen import SplashScreen
 
 
 class WmsVideoApp(App):
@@ -69,6 +70,7 @@ class WmsVideoApp(App):
 
         # Screen manager
         self.sm = ScreenManager()
+        self.sm.add_widget(SplashScreen(name='splash'))
         self.sm.add_widget(ConfirmScreen(name='confirm'))
         self.sm.add_widget(RecordScreen(name='record'))
         self.sm.add_widget(UploadScreen(name='upload'))
@@ -86,15 +88,19 @@ class WmsVideoApp(App):
         # Проверяем Intent при старте
         self._setup_android_intent_handler()
 
+        # Всегда показываем сплэш-экран
+        self.sm.current = 'splash'
+
         if self._task_id:
             Logger.info(f"WmsApp: получен task_id из CLI: {self._task_id}")
             self.logger.info("APP", f"Получен task_id из CLI: {self._task_id}")
             Clock.schedule_once(lambda dt: self.show_task_confirmation(self._task_id), 0.5)
-        else:
-            # Ждём Intent
-            self.sm.current = 'confirm'
 
         return self.sm
+
+    def show_confirm(self):
+        """Переход на ConfirmScreen (после сплэша)."""
+        self.sm.current = 'confirm'
 
     # ═════════════════════════════════════════════
     # ОБРАБОТКА INTENT ОТ WMS

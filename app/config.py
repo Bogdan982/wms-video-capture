@@ -19,7 +19,7 @@ CONFIG_FILE = os.path.join(
 )
 
 # Пароль по умолчанию (hex-хэш sha256 от "admin")
-_DEFAULT_PASSWORD_HASH = hashlib.sha256(b'admin').hexdigest()
+_DEFAULT_PASSWORD_HASH = hashlib.sha256(b'0000').hexdigest()
 
 
 class AppConfig:
