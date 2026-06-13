@@ -5,8 +5,7 @@
   "Получен идентификатор заказа №XXXXXXXXXX. Начать съёмку?"
 
 Кнопка "Начать съёмку" с защитой от случайного нажатия:
-  - Долгое нажатие (3 сек) или
-  - Два последовательных нажатия с подтверждением
+  - Долгое нажатие (2 сек)
   - Прогресс-бар удержания кнопки
 """
 from kivy.uix.screenmanager import Screen
@@ -21,84 +20,125 @@ CONFIRM_KV = """
 <ConfirmScreen>:
     BoxLayout:
         orientation: 'vertical'
-        spacing: 15
-        padding: 30
+        spacing: 5
+        padding: 10, 5, 10, 10
+
+        # -- Status bar --
+        BoxLayout:
+            size_hint_y: 0.06
+            spacing: 5
+
+            Label:
+                text: root.status_text
+                font_size: '10sp'
+                color: (0.6, 1.0, 0.6, 1)
+                size_hint_x: 0.65
+                halign: 'left'
+
+            Button:
+                text: '⚙'
+                font_size: '14sp'
+                size_hint_x: 0.15
+                background_color: (0.3, 0.3, 0.5, 0.7)
+                on_release: root.open_settings()
+
+            Button:
+                text: '✕'
+                font_size: '14sp'
+                size_hint_x: 0.15
+                background_color: (0.5, 0.3, 0.3, 0.7)
+                on_release: root.close_app()
 
         # Заголовок
         Label:
             text: 'WMS Video Capture'
-            font_size: '24sp'
+            font_size: '22sp'
             bold: True
             color: (0.2, 0.6, 1.0, 1)
             size_hint_y: 0.1
 
-        Widget:
-            size_hint_y: 0.05
-
         # Основное уведомление
         BoxLayout:
             orientation: 'vertical'
-            size_hint_y: 0.35
+            size_hint_y: 0.3
 
             Label:
-                text: '📋 Получен идентификатор заказа:'
-                font_size: '16sp'
+                text: 'Получен идентификатор заказа:'
+                font_size: '14sp'
                 color: (0.7, 0.7, 0.7, 1)
                 halign: 'center'
                 size_hint_y: 0.2
 
             Label:
                 text: root.task_id_display
-                font_size: '32sp'
+                font_size: '28sp'
                 bold: True
                 color: (1, 1, 1, 1)
                 halign: 'center'
-                text_size: (self.width, None)
                 size_hint_y: 0.4
 
             Label:
                 text: 'Начать съёмку?'
-                font_size: '18sp'
+                font_size: '16sp'
                 color: (0.8, 0.8, 0.8, 1)
                 halign: 'center'
                 size_hint_y: 0.2
 
-        Widget:
-            size_hint_y: 0.05
-
-        # ── Защищённая кнопка "Начать съёмку" ──
+        # -- Защищённая кнопка --
         BoxLayout:
             orientation: 'vertical'
             size_hint_y: 0.25
+            spacing: 3
+
+            Button:
+                id: start_btn
+                text: root.button_text
+                font_size: '20sp'
+                bold: True
+                size_hint_y: 0.7
+                background_color: (0.2, 0.8, 0.2, root.button_alpha)
+                disabled: root.button_disabled
+                on_touch_down: root.on_button_touch(args[1])
+                on_touch_up: root.on_button_release(args[1])
+
+            ProgressBar:
+                id: hold_progress
+                value: root.hold_progress_value
+                max: 1.0
+                size_hint_y: 0.15
+
+            Label:
+                text: root.hold_hint
+                font_size: '11sp'
+                color: (0.6, 0.6, 0.6, 1)
+                size_hint_y: 0.1
+                halign: 'center'
+
+        # -- Ручной запуск (без Intent) --
+        BoxLayout:
+            id: manual_box
+            size_hint_y: 0.12
             spacing: 5
 
-            Button:\n                id: start_btn\n                text: root.button_text\n                font_size: '22sp'\n                bold: True\n                size_hint_y: 0.7\n                background_color: (0.2, 0.8, 0.2, root.button_alpha)\n                disabled: root.button_disabled\n                on_touch_down: root.on_button_touch(args[1])\n                on_touch_up: root.on_button_release(args[1])\n                on_release: root.on_button_click()\n\n            # Индикатор удержания\n            ProgressBar:\n                id: hold_progress\n                value: root.hold_progress_value\n                max: 1.0\n                size_hint_y: 0.2\n                color: (0.2, 0.8, 0.2, 1)\n\n            Label:\n                text: root.hold_hint\n                font_size: '12sp'\n                color: (0.6, 0.6, 0.6, 1)\n                size_hint_y: 0.1\n                halign: 'center'\n\n        # ── Ручной запуск (без Intent) ──\n        BoxLayout:\n            id: manual_box\n            size_hint_y: 0.15\n            spacing: 10\n            opacity: root.manual_mode_opacity\n            disabled: not root.manual_mode\n\n            Label:\n                text: 'Нет задания? Укажите ID вручную:'\n                font_size: '13sp'\n                color: (0.7, 0.7, 0.7, 1)\n                size_hint_x: 0.55\n                halign: 'right'\n\n            Button:\n                text: '📷 QR-сканер'\n                font_size: '15sp'\n                size_hint_x: 0.45\n                background_color: (0.2, 0.6, 1.0, 1)\n                on_release: root.start_qr_scan()
-
-        Widget:
-            size_hint_y: 0.05
-
-        # Кнопка настроек (маленькая, внизу)
-        BoxLayout:
-            size_hint_y: 0.08
-            spacing: 10
-
-            Widget:
+            Label:
+                text: 'Нет задания?'
+                font_size: '12sp'
+                color: (0.7, 0.7, 0.7, 1)
+                size_hint_x: 0.4
+                halign: 'right'
 
             Button:
-                text: '⚙ Настройки'
+                text: 'QR-сканер'
                 font_size: '14sp'
                 size_hint_x: 0.4
-                background_color: (0.3, 0.3, 0.5, 0.7)
-                on_release: root.open_settings()
-
-            Button:
-                text: '✕ Закрыть'
-                font_size: '14sp'
-                size_hint_x: 0.3
-                background_color: (0.5, 0.3, 0.3, 0.7)
-                on_release: root.close_app()
+                background_color: (0.2, 0.6, 1.0, 1)
+                on_release: root.start_qr_scan()
 
             Widget:
+                size_hint_x: 0.2
+
+        Widget:
+            size_hint_y: 0.02
 """
 
 # Время удержания для активации (секунд)
@@ -106,18 +146,16 @@ HOLD_DURATION = 2.0
 
 
 class ConfirmScreen(Screen):
-    """
-    Экран подтверждения с защитой от случайного нажатия.
-    Кнопка активируется после удержания в течение HOLD_DURATION.
-    """
+    """Экран подтверждения с защитой от случайного нажатия."""
 
     task_id = StringProperty('')
-    task_id_display = StringProperty('—')
+    task_id_display = StringProperty('-')
     button_text = StringProperty('УДЕРЖИВАЙТЕ 2 СЕК')
     button_disabled = BooleanProperty(True)
     button_alpha = NumericProperty(0.5)
     hold_progress_value = NumericProperty(0.0)
-    hold_hint = StringProperty('Удерживайте кнопку 2 секунды для начала съёмки')
+    hold_hint = StringProperty('Удерживайте кнопку 2 секунды')
+    status_text = StringProperty('Сеть: проверка...')
     manual_mode = BooleanProperty(True)
     manual_mode_opacity = NumericProperty(1.0)
 
@@ -128,8 +166,12 @@ class ConfirmScreen(Screen):
         self._hold_timer = None
         self._hold_anim = None
 
+    def on_enter(self):
+        """При переходе на экран — проверяем статус сети."""
+        self._check_network()
+
     def on_pre_enter(self):
-        """При подготовке экрана — берём task_id из App."""
+        """Берём task_id из App."""
         app = self._get_app()
         if app and app.current_task_id:
             self.task_id = app.current_task_id
@@ -137,93 +179,83 @@ class ConfirmScreen(Screen):
             self._reset_button()
             self.manual_mode = False
             self.manual_mode_opacity = 0.0
-            Logger.info(f"ConfirmScreen: показан ID {self.task_id}")
         else:
-            self.task_id_display = '—'
+            self.task_id_display = '-'
             self.manual_mode = True
             self.manual_mode_opacity = 1.0
             self.hold_hint = 'Используйте QR-сканер для ввода ID'
-            Logger.info("ConfirmScreen: ручной режим (нет Intent)")
 
     def on_leave(self):
-        """При уходе — сбрасываем состояние кнопки."""
         self._cancel_hold()
 
-    # ── Защита от случайного нажатия: удержание ──
+    def _check_network(self):
+        """Проверка доступности SMB/WMS."""
+        app = self._get_app()
+        if not app:
+            return
+        try:
+            smb_ok = app.network.check_connectivity()
+            wms_ok = app.wms.health_check()
+            if smb_ok and wms_ok:
+                self.status_text = 'Сеть: SMB OK | WMS OK'
+            elif smb_ok:
+                self.status_text = 'Сеть: SMB OK | WMS НЕТ'
+            elif wms_ok:
+                self.status_text = 'Сеть: SMB НЕТ | WMS OK'
+            else:
+                self.status_text = 'Сеть: нет соединения'
+        except Exception:
+            self.status_text = 'Сеть: ошибка'
+
+    # -- Защита от случайного нажатия --
 
     def on_button_touch(self, touch):
-        """Начало касания кнопки."""
         if self.button_disabled:
             return
         if not self.ids.start_btn.collide_point(*touch.pos):
             return
         if touch.is_mouse_scrolling:
             return
-
         self._hold_active = True
         self.hold_progress_value = 0.0
         self.button_text = 'УДЕРЖИВАЙТЕ...'
-        self.hold_hint = f'Удерживайте {HOLD_DURATION} сек...'
-
-        # Анимация прогресс-бара
-        self._hold_anim = Animation(
-            hold_progress_value=1.0,
-            duration=HOLD_DURATION
-        )
+        self._hold_anim = Animation(hold_progress_value=1.0, duration=HOLD_DURATION)
         self._hold_anim.bind(on_complete=self._on_hold_complete)
         self._hold_anim.start(self)
-
-        # Таймер на случай сбоя анимации
-        self._hold_timer = Clock.schedule_once(
-            self._on_hold_complete, HOLD_DURATION
-        )
+        self._hold_timer = Clock.schedule_once(self._on_hold_complete, HOLD_DURATION)
 
     def on_button_release(self, touch):
-        """Отпускание кнопки — сброс, если удержание не завершено."""
         if not self._hold_active:
             return
         if self.hold_progress_value < 1.0:
             self._cancel_hold()
-            self.hold_hint = 'Отпущено слишком рано. Повторите удержание.'
-            # Сброс через 1.5 сек
+            self.hold_hint = 'Отпущено рано. Повторите.'
             Clock.schedule_once(lambda dt: self._reset_button(), 1.5)
 
     def on_button_click(self):
-        """Обычный клик (без удержания) — игнорируем."""
         if self.hold_progress_value < 1.0:
             self._cancel_hold()
-            self.hold_hint = 'Удерживайте кнопку, не отпуская!'
+            self.hold_hint = 'Удерживайте, не отпуская!'
             Clock.schedule_once(lambda dt: self._reset_button(), 1.5)
 
     def _on_hold_complete(self, *args):
-        """Удержание завершено — кнопка активирована."""
         if not self._hold_active:
             return
-
         self._hold_active = False
         self._cancel_timer()
-
         self.hold_progress_value = 1.0
-        self.button_text = '▶ СТАРТ'
+        self.button_text = 'СТАРТ'
         self.button_disabled = False
         self.button_alpha = 1.0
-        self.hold_hint = 'Нажмите для начала съёмки'
-
-        # Ещё один клик для запуска
-        # (или можно запустить автоматически после удержания)
+        self.hold_hint = 'Запуск камеры...'
         self._start_recording()
 
     def _start_recording(self):
-        """Запуск видеосъёмки через App."""
-        Logger.info(f"ConfirmScreen: запуск съёмки для {self.task_id}")
-        self.hold_hint = 'Запуск камеры...'
-
         app = self._get_app()
         if app:
             app.start_recording()
 
     def _cancel_hold(self):
-        """Отмена удержания."""
         self._hold_active = False
         self._cancel_timer()
         if self._hold_anim:
@@ -232,37 +264,29 @@ class ConfirmScreen(Screen):
         self.hold_progress_value = 0.0
 
     def _cancel_timer(self):
-        """Отмена таймера."""
         if self._hold_timer:
             self._hold_timer.cancel()
             self._hold_timer = None
 
     def _reset_button(self):
-        """Сброс кнопки в исходное состояние."""
         self._cancel_hold()
         self.button_text = 'УДЕРЖИВАЙТЕ 2 СЕК'
         self.button_disabled = True
         self.button_alpha = 0.5
         self.hold_progress_value = 0.0
-        self.hold_hint = 'Удерживайте кнопку 2 секунды для начала съёмки'
-
-    # ── Действия ──
+        self.hold_hint = 'Удерживайте кнопку 2 секунды'
 
     def open_settings(self):
-        """Открыть настройки."""
         app = self._get_app()
         if app:
             app.open_settings()
 
     def start_qr_scan(self):
-        """Запуск QR-сканера для ручного ввода ID."""
-        Logger.info("ConfirmScreen: ручной запуск QR-сканера")
         app = self._get_app()
         if app:
             app.on_scan_requested()
 
     def close_app(self):
-        """Закрыть приложение."""
         app = self._get_app()
         if app:
             app.on_request_close()
