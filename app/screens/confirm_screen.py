@@ -190,22 +190,22 @@ class ConfirmScreen(Screen):
 
     def _check_network(self):
         """Проверка доступности SMB/WMS."""
-        app = self._get_app()
-        if not app:
-            return
         try:
+            app = self._get_app()
+            if not app:
+                return
             smb_ok = app.network.check_connectivity()
             wms_ok = app.wms.health_check()
             if smb_ok and wms_ok:
-                self.status_text = 'Сеть: SMB OK | WMS OK'
+                self.status_text = 'Сеть: OK'
             elif smb_ok:
-                self.status_text = 'Сеть: SMB OK | WMS НЕТ'
+                self.status_text = 'Сеть: SMB OK'
             elif wms_ok:
-                self.status_text = 'Сеть: SMB НЕТ | WMS OK'
+                self.status_text = 'Сеть: WMS OK'
             else:
-                self.status_text = 'Сеть: нет соединения'
-        except Exception:
-            self.status_text = 'Сеть: ошибка'
+                self.status_text = 'Сеть: нет'
+        except Exception as e:
+            self.status_text = 'Сеть: —'
 
     # -- Защита от случайного нажатия --
 
