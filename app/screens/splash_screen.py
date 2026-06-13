@@ -20,7 +20,23 @@ SPLASH_KV = """
             size_hint_y: 0.15
 
         Label:
-            text: 'ПРОГРАММА АВТОМАТИЗАЦИИ\\nВИДЕОФИКСАЦИИ СКЛАДСКОГО\\nПРОИЗВОДСТВА'
+            text: 'ПРОГРАММА АВТОМАТИЗАЦИИ'
+            font_size: '18sp'
+            bold: True
+            color: (1, 1, 1, 1)
+            halign: 'center'
+            size_hint_y: 0.09
+
+        Label:
+            text: 'ВИДЕОФИКСАЦИИ СКЛАДСКОГО'
+            font_size: '18sp'
+            bold: True
+            color: (1, 1, 1, 1)
+            halign: 'center'
+            size_hint_y: 0.09
+
+        Label:
+            text: 'ПРОИЗВОДСТВА'
             font_size: '18sp'
             bold: True
             color: (1, 1, 1, 1)

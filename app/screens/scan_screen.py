@@ -32,7 +32,14 @@ SCAN_KV = """
             spacing: 10
 
             Label:
-                text: 'Наведите камеру на QR-код\nс идентификатором заказа'
+                text: 'Наведите камеру на QR-код'
+                font_size: '18sp'
+                color: (0.8, 0.8, 0.8, 1)
+                halign: 'center'
+                text_size: (self.width, None)
+
+            Label:
+                text: 'с идентификатором заказа'
                 font_size: '18sp'
                 color: (0.7, 0.7, 0.7, 1)
                 halign: 'center'
