@@ -3,6 +3,7 @@ SplashScreen — заставка при запуске.
 Градиент: голубой → синий → чёрный (сверху вниз).
 Заголовок + название организации + копирайт.
 """
+from kivy.app import App
 from kivy.uix.screenmanager import Screen
 from kivy.lang import Builder
 from kivy.properties import StringProperty
@@ -112,12 +113,9 @@ class SplashScreen(Screen):
     def _goto_main(self, dt):
         """Переход к ConfirmScreen."""
         Logger.info("SplashScreen: переход к ConfirmScreen")
-        app = self._get_app()
+        app = App.get_running_app()
         if app:
             app.show_confirm()
 
     def _get_app(self):
-        try:
-            return self.manager.parent
-        except Exception:
-            return None
+        return App.get_running_app()
