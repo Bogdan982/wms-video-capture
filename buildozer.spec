@@ -54,6 +54,9 @@ orientation = portrait
 # (bool) Full screen
 fullscreen = 1
 
+# (bool) Enable AndroidX (required for FileProvider)
+android.use_androidx = True
+
 # (list) Android permissions
 android.permissions = CAMERA, RECORD_AUDIO, INTERNET, WRITE_EXTERNAL_STORAGE, READ_EXTERNAL_STORAGE, FOREGROUND_SERVICE
 
