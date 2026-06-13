@@ -1,64 +1,74 @@
 """
-WMS Video Capture — минимальная версия для отладки краша.
+WMS Video Capture — Android App.
+Точка входа. Обрабатывает Intent из WMS и ActivityResult от камеры/QR.
 """
+import os
+import sys
+
+# Отлавливаем task_id из CLI до инициализации Kivy
+_task_id = None
+if len(sys.argv) > 1:
+    for arg in sys.argv[1:]:
+        if 'task_id=' in arg:
+            _task_id = arg.split('task_id=')[-1].split('&')[0]
+
 import kivy
 kivy.require('2.2.0')
 
 from kivy.config import Config
 Config.set('kivy', 'log_level', 'info')
+Config.set('graphics', 'resizable', False)
+Config.set('graphics', 'width', '480')
+Config.set('graphics', 'height', '800')
 
-from kivy.app import App
-from kivy.uix.screenmanager import ScreenManager, Screen
-from kivy.uix.boxlayout import BoxLayout
-from kivy.uix.button import Button
-from kivy.uix.label import Label
-from kivy.lang import Builder
+from app.app import WmsVideoApp
 
-KV = """
-<MinimalScreen>:
-    BoxLayout:
-        orientation: 'vertical'
-        padding: 30
-        spacing: 20
-
-        Label:
-            text: 'WMS Video Capture'
-            font_size: '24sp'
-            bold: True
-            color: (0.2, 0.6, 1.0, 1)
-            size_hint_y: 0.15
-
-        Label:
-            text: 'App started!\\n(minimal test)'
-            font_size: '18sp'
-            halign: 'center'
-            size_hint_y: 0.3
-
-        Button:
-            text: 'Закрыть'
-            font_size: '16sp'
-            size_hint_y: 0.15
-            on_release: app.stop()
-
-        Label:
-            text: 'Roman design (c) 2025'
-            font_size: '10sp'
-            color: (0.5, 0.5, 0.5, 1)
-            size_hint_y: 0.1
-"""
+# Android Activity Result Handler
+try:
+    from android import activity
+    _ANDROID = True
+except ImportError:
+    _ANDROID = False
 
 
-class MinimalScreen(Screen):
-    pass
+def main():
+    """Точка входа."""
+    # Запрос разрешений на Android
+    if _ANDROID:
+        _request_permissions()
 
+    app = WmsVideoApp(task_id=_task_id)
 
-class MinimalApp(App):
-    def build(self):
-        Builder.load_string(KV)
-        sm = ScreenManager()
-        sm.add_widget(MinimalScreen(name='main'))
-        return sm
+    if _ANDROID:
+        # Регистрируем единый обработчик ActivityResult
+        # который диспатчит по request_code
+        def on_activity_result(request_code, result_code, data):
+            if request_code == 1001:  # Camera
+                app.camera.on_activity_result(request_code, result_code, data)
+            elif request_code == 2001:  # QR Scanner
+                app.qr.on_activity_result(request_code, result_code, data)
+
+        activity.bind(on_activity_result=on_activity_result)
+
+    app.run()
 
 
 if __name__ == '__main__':
-    MinimalApp().run()
+    main()
+
+def _request_permissions():
+    """Запрашивает разрешения: камера, микрофон, хранилище."""
+    try:
+        from android.permissions import request_permissions, Permission, check_permission
+        needed = []
+        if not check_permission(Permission.CAMERA):
+            needed.append(Permission.CAMERA)
+        if not check_permission(Permission.RECORD_AUDIO):
+            needed.append(Permission.RECORD_AUDIO)
+        if not check_permission(Permission.WRITE_EXTERNAL_STORAGE):
+            needed.append(Permission.WRITE_EXTERNAL_STORAGE)
+        if needed:
+            request_permissions(needed)
+    except Exception as e:
+        from kivy.logger import Logger
+        Logger.warning(f"Permissions: {e}")
