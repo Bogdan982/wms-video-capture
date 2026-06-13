@@ -72,32 +72,7 @@ CONFIRM_KV = """
             size_hint_y: 0.25
             spacing: 5
 
-            Button:
-                id: start_btn
-                text: root.button_text
-                font_size: '22sp'
-                bold: True
-                size_hint_y: 0.7
-                background_color: (0.2, 0.8, 0.2, root.button_alpha)
-                disabled: root.button_disabled
-                on_touch_down: root.on_button_touch(args[1])
-                on_touch_up: root.on_button_release(args[1])
-                on_release: root.on_button_click()
-
-            # Индикатор удержания
-            ProgressBar:
-                id: hold_progress
-                value: root.hold_progress_value
-                max: 1.0
-                size_hint_y: 0.2
-                color: (0.2, 0.8, 0.2, 1)
-
-            Label:
-                text: root.hold_hint
-                font_size: '12sp'
-                color: (0.6, 0.6, 0.6, 1)
-                size_hint_y: 0.1
-                halign: 'center'
+            Button:\n                id: start_btn\n                text: root.button_text\n                font_size: '22sp'\n                bold: True\n                size_hint_y: 0.7\n                background_color: (0.2, 0.8, 0.2, root.button_alpha)\n                disabled: root.button_disabled\n                on_touch_down: root.on_button_touch(args[1])\n                on_touch_up: root.on_button_release(args[1])\n                on_release: root.on_button_click()\n\n            # Индикатор удержания\n            ProgressBar:\n                id: hold_progress\n                value: root.hold_progress_value\n                max: 1.0\n                size_hint_y: 0.2\n                color: (0.2, 0.8, 0.2, 1)\n\n            Label:\n                text: root.hold_hint\n                font_size: '12sp'\n                color: (0.6, 0.6, 0.6, 1)\n                size_hint_y: 0.1\n                halign: 'center'\n\n        # ── Ручной запуск (без Intent) ──\n        BoxLayout:\n            id: manual_box\n            size_hint_y: 0.15\n            spacing: 10\n            opacity: root.manual_mode_opacity\n            disabled: not root.manual_mode\n\n            Label:\n                text: 'Нет задания? Укажите ID вручную:'\n                font_size: '13sp'\n                color: (0.7, 0.7, 0.7, 1)\n                size_hint_x: 0.55\n                halign: 'right'\n\n            Button:\n                text: '📷 QR-сканер'\n                font_size: '15sp'\n                size_hint_x: 0.45\n                background_color: (0.2, 0.6, 1.0, 1)\n                on_release: root.start_qr_scan()
 
         Widget:
             size_hint_y: 0.05
@@ -143,6 +118,8 @@ class ConfirmScreen(Screen):
     button_alpha = NumericProperty(0.5)
     hold_progress_value = NumericProperty(0.0)
     hold_hint = StringProperty('Удерживайте кнопку 2 секунды для начала съёмки')
+    manual_mode = BooleanProperty(True)
+    manual_mode_opacity = NumericProperty(1.0)
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
@@ -158,8 +135,15 @@ class ConfirmScreen(Screen):
             self.task_id = app.current_task_id
             self.task_id_display = app.current_task_id
             self._reset_button()
-
+            self.manual_mode = False
+            self.manual_mode_opacity = 0.0
             Logger.info(f"ConfirmScreen: показан ID {self.task_id}")
+        else:
+            self.task_id_display = '—'
+            self.manual_mode = True
+            self.manual_mode_opacity = 1.0
+            self.hold_hint = 'Используйте QR-сканер для ввода ID'
+            Logger.info("ConfirmScreen: ручной режим (нет Intent)")
 
     def on_leave(self):
         """При уходе — сбрасываем состояние кнопки."""
@@ -269,6 +253,13 @@ class ConfirmScreen(Screen):
         app = self._get_app()
         if app:
             app.open_settings()
+
+    def start_qr_scan(self):
+        """Запуск QR-сканера для ручного ввода ID."""
+        Logger.info("ConfirmScreen: ручной запуск QR-сканера")
+        app = self._get_app()
+        if app:
+            app.on_scan_requested()
 
     def close_app(self):
         """Закрыть приложение."""
