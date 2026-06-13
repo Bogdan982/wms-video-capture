@@ -167,8 +167,9 @@ class ConfirmScreen(Screen):
         self._hold_anim = None
 
     def on_enter(self):
-        """При переходе на экран — проверяем статус сети."""
-        self._check_network()
+        """При переходе на экран — проверяем статус сети с задержкой."""
+        self.status_text = 'Сеть: —'
+        Clock.schedule_once(lambda dt: self._check_network(), 2.0)
 
     def on_pre_enter(self):
         """Берём task_id из App."""
