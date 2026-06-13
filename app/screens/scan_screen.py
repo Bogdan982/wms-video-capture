@@ -1,174 +1,96 @@
 """
-Экран QR-сканирования идентификатора.
-
-Запускает системный QR-сканер (ZXing Barcode Scanner) через Intent.
-Показывает инструкцию и статус.
+Экран QR-сканирования — программный (без KV).
 """
 from kivy.uix.screenmanager import Screen
-from kivy.lang import Builder
-from kivy.properties import StringProperty, BooleanProperty
+from kivy.uix.boxlayout import BoxLayout
+from kivy.uix.button import Button
+from kivy.uix.label import Label
 from kivy.clock import Clock
 from kivy.logger import Logger
-
-SCAN_KV = """
-<ScanScreen>:
-    BoxLayout:
-        orientation: 'vertical'
-        spacing: 15
-        padding: 30
-
-        Label:
-            text: '📷 Сканирование QR-кода'
-            font_size: '24sp'
-            bold: True
-            color: (0.2, 0.6, 1.0, 1)
-
-        Widget:
-            size_hint_y: 0.05
-
-        BoxLayout:
-            orientation: 'vertical'
-            size_hint_y: 0.4
-            spacing: 10
-
-            Label:
-                text: 'Наведите камеру на QR-код'
-                font_size: '18sp'
-                color: (0.8, 0.8, 0.8, 1)
-                halign: 'center'
-                text_size: (self.width, None)
-
-            Label:
-                text: 'с идентификатором заказа'
-                font_size: '18sp'
-                color: (0.7, 0.7, 0.7, 1)
-                halign: 'center'
-                text_size: (self.width, None)
-
-            Label:
-                text: root.status_text
-                font_size: '16sp'
-                color: (1, 1, 1, root.status_alpha)
-                halign: 'center'
-
-        Widget:
-
-        # Индикатор сканирования
-        BoxLayout:
-            orientation: 'vertical'
-            size_hint_y: 0.2
-
-            Label:
-                text: root.scanned_id_display
-                font_size: '28sp'
-                bold: True
-                color: (0.2, 0.8, 0.2, 1)
-                halign: 'center'
-
-            Label:
-                text: root.scanned_label
-                font_size: '14sp'
-                color: (0.6, 0.6, 0.6, 1)
-                halign: 'center'
-
-        Widget:
-
-        # Кнопки
-        BoxLayout:
-            size_hint_y: 0.15
-            spacing: 15
-
-            Button:
-                text: '↩ Назад'
-                font_size: '18sp'
-                background_color: (0.5, 0.5, 0.5, 0.7)
-                on_release: root.go_back()
-
-            Button:
-                text: '🔄 Повторить'
-                font_size: '18sp'
-                background_color: (0.2, 0.6, 1, 0.7)
-                disabled: root.scan_running
-                on_release: root.restart_scan()
-"""
+from kivy.app import App
 
 
 class ScanScreen(Screen):
-    """Экран QR-сканирования с инструкцией."""
-
-    status_text = StringProperty('Ожидание запуска сканера...')
-    status_alpha = 1.0
-    scanned_id_display = StringProperty('')
-    scanned_label = StringProperty('')
-    scan_running = BooleanProperty(True)
+    """QR-сканер — программный."""
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
-        Builder.load_string(SCAN_KV)
         self._scanned_id = None
+        
+        layout = BoxLayout(orientation='vertical', padding=30, spacing=15)
+        
+        layout.add_widget(Label(
+            text='Сканирование QR-кода',
+            font_size='22sp',
+            bold=True,
+            color=(0.2, 0.6, 1.0, 1),
+            size_hint_y=0.1
+        ))
+        
+        self.status_label = Label(
+            text='Запуск сканера...',
+            font_size='16sp',
+            color=(0.8, 0.8, 0.8, 1),
+            halign='center',
+            size_hint_y=0.1
+        )
+        layout.add_widget(self.status_label)
+        
+        self.result_label = Label(
+            text='',
+            font_size='20sp',
+            bold=True,
+            color=(0.2, 1.0, 0.2, 1),
+            halign='center',
+            size_hint_y=0.3
+        )
+        layout.add_widget(self.result_label)
+        
+        btn_back = Button(
+            text='Назад (без сканирования)',
+            font_size='16sp',
+            size_hint_y=0.15,
+            background_color=(0.5, 0.5, 0.5, 0.7)
+        )
+        btn_back.bind(on_press=self._go_back)
+        layout.add_widget(btn_back)
+        
+        btn_rescan = Button(
+            text='Сканировать снова',
+            font_size='16sp',
+            size_hint_y=0.15,
+            background_color=(0.2, 0.6, 1.0, 1)
+        )
+        btn_rescan.bind(on_press=self._restart)
+        layout.add_widget(btn_rescan)
+        
+        self.add_widget(layout)
 
     def on_enter(self):
-        """При переходе — запускаем сканер."""
-        self.status_text = 'Запуск сканера...'
-        self.scanned_id_display = ''
-        self.scanned_label = ''
-        self._scanned_id = None
-        self.scan_running = True
-        Logger.info("ScanScreen: ожидание QR-кода")
-
-    def on_leave(self):
-        """Уход с экрана."""
-        self.scan_running = False
+        self.status_label.text = 'Ожидание QR-кода...'
+        self.result_label.text = ''
 
     def on_scan_result(self, scanned_text: str):
-        """
-        Результат сканирования.
-        Вызывается из QRService при успешном сканировании.
-        """
-        if not scanned_text:
-            self.status_text = 'QR-код не распознан. Попробуйте снова.'
-            return
-
-        self._scanned_id = scanned_text
-        self.scanned_id_display = scanned_text
-        self.scanned_label = '✅ Идентификатор получен'
-        self.status_text = 'Сканирование выполнено успешно'
-        self.scan_running = False
-
-        Logger.info(f"ScanScreen: получен ID: {scanned_text}")
-
-        # Автоматически передаём в App через 1 секунду
-        Clock.schedule_once(lambda dt: self._apply_result(), 1.0)
+        if scanned_text:
+            self._scanned_id = scanned_text
+            self.result_label.text = f'ID: {scanned_text}'
+            self.status_label.text = 'Получен!'
+            Clock.schedule_once(lambda dt: self._apply_result(), 1.5)
 
     def _apply_result(self):
-        """Передаёт результат в App."""
-        if not self._scanned_id:
-            return
+        if self._scanned_id:
+            app = App.get_running_app()
+            if app:
+                app.on_scan_result(self._scanned_id)
 
-        app = self._get_app()
-        if app:
-            app.on_scan_result(self._scanned_id)
-
-    def restart_scan(self):
-        """Повторный запуск сканера."""
-        Logger.info("ScanScreen: повторное сканирование")
-        self.status_text = 'Запуск сканера...'
-        self.scanned_id_display = ''
-        self.scanned_label = ''
-        self._scanned_id = None
-        self.scan_running = True
-
-        app = self._get_app()
+    def _restart(self, *args):
+        self.result_label.text = ''
+        self.status_label.text = 'Перезапуск...'
+        app = App.get_running_app()
         if app:
             app.qr.start_scan()
 
-    def go_back(self):
-        """Назад (без сканирования — используем текущий ID)."""
-        Logger.info("ScanScreen: возврат без сканирования")
-        app = self._get_app()
+    def _go_back(self, *args):
+        app = App.get_running_app()
         if app:
             app.on_use_current_id()
-
-    def _get_app(self):
-        from kivy.app import App
-        return App.get_running_app()
