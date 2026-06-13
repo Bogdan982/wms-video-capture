@@ -95,7 +95,6 @@ android.manifest = assets/AndroidManifest.xml
 
 # (bool) If True, then skip trying to update the Android SDK
 android.accept_sdk_license = True
-android.build_tools = 34.0.0
 
 # (str) Log level (debug, info, warning, error)
 log_level = 2
