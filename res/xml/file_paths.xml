@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<paths>
+    <cache-path name="cache_videos" path="videos/" />
+    <external-files-path name="external_videos" path="WMSCapture/" />
+    <external-path name="public_movies" path="Movies/WMSCapture/" />
+</paths>

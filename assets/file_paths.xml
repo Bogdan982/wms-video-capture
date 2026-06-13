@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+FileProvider paths для Android 7+.
+Позволяет передавать URI видеофайлов системной камере.
+
+Файл должен находиться в res/xml/file_paths.xml внутри APK.
+-->
+<paths>
+    <!-- Кэш-директория приложения (для временных видео) -->
+    <cache-path
+        name="cache_videos"
+        path="videos/" />
+
+    <!-- Внешнее хранилище (для постоянных видео) -->
+    <external-files-path
+        name="external_videos"
+        path="WMSCapture/" />
+
+    <!-- Внешнее публичное хранилище (Movies) -->
+    <external-path
+        name="public_movies"
+        path="Movies/WMSCapture/" />
+</paths>
