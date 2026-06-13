@@ -18,6 +18,12 @@ from kivy.logger import Logger
 
 CONFIRM_KV = """
 <ConfirmScreen>:
+    canvas.before:
+        Color:
+            rgba: (0.1, 0.1, 0.15, 1)
+        Rectangle:
+            pos: self.pos
+            size: self.size
     BoxLayout:
         orientation: 'vertical'
         spacing: 5
