@@ -1,5 +1,5 @@
 """
-DoneScreen — русский, без выгрузки (тестовый режим).
+DoneScreen — с проверкой сети перед выгрузкой.
 """
 from kivy.uix.screenmanager import Screen
 from kivy.uix.boxlayout import BoxLayout
@@ -23,7 +23,7 @@ class DoneScreen(Screen):
         self._build_ui()
 
     def _build_ui(self):
-        layout = BoxLayout(orientation='vertical', padding=25, spacing=12)
+        layout = BoxLayout(orientation='vertical', padding=25, spacing=10)
 
         self.title_label = Label(
             text='', font_size='20sp', bold=True, color=GREEN,
@@ -67,8 +67,8 @@ class DoneScreen(Screen):
         app = App.get_running_app()
         tid = app.current_task_id if app else '---'
         self.title_label.text = 'ВИДЕО СОХРАНЕНО'
-        self.info_label.text = f'ID задачи: {tid}'
-        self.btn1.text = f'ИСПОЛЬЗОВАТЬ ID: {tid}'
+        self.info_label.text = f'ID задачи: {tid}\n(проверьте сеть перед выгрузкой)'
+        self.btn1.text = f'ВЫГРУЗИТЬ (ID: {tid})'
         self.btn1.background_color = (0.2, 0.8, 0.2, 1)
         self.btn1.disabled = False
         self.btn1.opacity = 1
@@ -81,23 +81,44 @@ class DoneScreen(Screen):
         self.btn3.disabled = False
         self.btn3.opacity = 1
 
+    def _check_network(self):
+        """Проверяет доступность сети."""
+        try:
+            app = App.get_running_app()
+            if app:
+                return app.network.check_connectivity()
+        except Exception:
+            pass
+        return False
+
     def _on_btn1(self, *args):
-        """Использовать текущий ID — в главное меню."""
-        Logger.info("DoneScreen: use current ID")
+        """Выгрузка с проверкой сети."""
+        if not self._check_network():
+            self.info_label.text = (
+                'ОШИБКА!\n'
+                'Сетевой ресурс недоступен.\n'
+                'Проверьте настройки подключения.'
+            )
+            self.info_label.color = RED
+            self.btn1.text = 'ПОВТОРИТЬ ВЫГРУЗКУ'
+            self.btn1.background_color = RED
+            return
+
+        Logger.info("DoneScreen: uploading...")
+        self.info_label.text = 'Выгрузка на сервер...'
+        self.info_label.color = GREEN_DIM
         app = App.get_running_app()
         if app:
-            app.sm.current = 'confirm'
+            app.on_use_current_id()
 
     def _on_btn2(self, *args):
         """QR-сканер."""
-        Logger.info("DoneScreen: open QR scanner")
         app = App.get_running_app()
         if app:
             app.on_scan_requested()
 
     def _on_btn3(self, *args):
-        """Закрыть — в главное меню."""
-        Logger.info("DoneScreen: back to confirm")
+        """В главное меню."""
         app = App.get_running_app()
         if app:
             app.sm.current = 'confirm'
