@@ -1,5 +1,5 @@
 """
-ConfirmScreen — русский, программный, терминальный стиль.
+ConfirmScreen — без удержания, кнопка сразу работает.
 """
 from kivy.uix.screenmanager import Screen
 from kivy.uix.boxlayout import BoxLayout
@@ -9,18 +9,11 @@ from kivy.clock import Clock
 from kivy.app import App
 from kivy.logger import Logger
 
-# Тема
 GREEN = (0.2, 1.0, 0.3, 1)
 GREEN_DIM = (0.15, 0.7, 0.2, 1)
 GRAY = (0.5, 0.5, 0.5, 1)
 BLUE = (0.3, 0.6, 1.0, 1)
-BG = (0.08, 0.08, 0.1, 1)
-INPUT_BG = (0.15, 0.15, 0.15, 1)
-
-
-def t_btn(text, color=BLUE, **kw):
-    return Button(text=text, font_size='15sp', background_color=color,
-                  color=(1, 1, 1, 1), **kw)
+RED = (1.0, 0.3, 0.3, 1)
 
 
 class ConfirmScreen(Screen):
@@ -31,55 +24,65 @@ class ConfirmScreen(Screen):
         self._build_ui()
 
     def _build_ui(self):
-        layout = BoxLayout(orientation='vertical', padding=20, spacing=10)
+        layout = BoxLayout(orientation='vertical', padding=20, spacing=8)
 
         self.status_label = Label(
-            text='Сеть: ожидание...',
-            font_size='12sp', color=GREEN_DIM,
-            size_hint_y=0.05, halign='left'
+            text='Сеть: ожидание...', font_size='11sp',
+            color=GREEN_DIM, size_hint_y=0.04, halign='left'
         )
         layout.add_widget(self.status_label)
 
         layout.add_widget(Label(
-            text='WMS VIDEO CAPTURE',
-            font_size='20sp', bold=True, color=GREEN,
-            size_hint_y=0.08, halign='center'
+            text='WMS VIDEO CAPTURE', font_size='20sp',
+            bold=True, color=GREEN, size_hint_y=0.07, halign='center'
         ))
 
         self.task_label = Label(
-            text='НЕТ ЗАДАНИЯ',
-            font_size='26sp', bold=True, color=GREEN,
-            size_hint_y=0.12, halign='center'
+            text='НЕТ ЗАДАНИЯ', font_size='24sp',
+            bold=True, color=GREEN, size_hint_y=0.1, halign='center'
         )
         layout.add_widget(self.task_label)
 
         self.hint_label = Label(
             text='Отсканируйте QR-код для получения задания',
-            font_size='14sp', color=GREEN_DIM,
-            size_hint_y=0.08, halign='center'
+            font_size='13sp', color=GREEN_DIM,
+            size_hint_y=0.06, halign='center'
         )
         layout.add_widget(self.hint_label)
 
-        self.record_btn = t_btn('УДЕРЖИВАЙТЕ 2 СЕК', GREEN_DIM, size_hint_y=0.14)
-        self.record_btn.bind(on_press=self._on_record)
-        layout.add_widget(self.record_btn)
+        record_btn = Button(
+            text='НАЧАТЬ ЗАПИСЬ', font_size='18sp',
+            size_hint_y=0.14, background_color=(0.2, 0.8, 0.2, 1),
+            color=(1, 1, 1, 1)
+        )
+        record_btn.bind(on_press=self._on_record)
+        layout.add_widget(record_btn)
 
-        qr_btn = t_btn('СКАНИРОВАТЬ QR-КОД', BLUE, size_hint_y=0.12)
+        qr_btn = Button(
+            text='СКАНИРОВАТЬ QR-КОД', font_size='15sp',
+            size_hint_y=0.12, background_color=BLUE, color=(1, 1, 1, 1)
+        )
         qr_btn.bind(on_press=self._on_scan)
         layout.add_widget(qr_btn)
 
-        settings_btn = t_btn('НАСТРОЙКИ', GRAY, size_hint_y=0.1)
+        settings_btn = Button(
+            text='НАСТРОЙКИ', font_size='14sp',
+            size_hint_y=0.1, background_color=GRAY, color=(1, 1, 1, 1)
+        )
         settings_btn.bind(on_press=self._on_settings)
         layout.add_widget(settings_btn)
 
-        close_btn = t_btn('ЗАКРЫТЬ', (0.5, 0.2, 0.2, 1), size_hint_y=0.08)
+        close_btn = Button(
+            text='ЗАКРЫТЬ', font_size='13sp',
+            size_hint_y=0.08, background_color=(0.5, 0.2, 0.2, 1),
+            color=(1, 1, 1, 1)
+        )
         close_btn.bind(on_press=self._on_close)
         layout.add_widget(close_btn)
 
         layout.add_widget(Label(
-            text='Roman design (c) 2025',
-            font_size='10sp', color=GRAY,
-            size_hint_y=0.06, halign='center'
+            text='Roman design (c) 2025', font_size='10sp',
+            color=GRAY, size_hint_y=0.05, halign='center'
         ))
 
         self.add_widget(layout)
@@ -88,12 +91,9 @@ class ConfirmScreen(Screen):
         app = App.get_running_app()
         if app and app.current_task_id:
             self.task_label.text = f'ЗАДАЧА: {app.current_task_id}'
-            self.record_btn.background_color = (0.2, 0.8, 0.2, 1)
-            self.record_btn.text = 'НАЧАТЬ ЗАПИСЬ'
-            self.hint_label.text = 'Удерживайте кнопку для начала съёмки'
+            self.hint_label.text = 'Нажмите НАЧАТЬ ЗАПИСЬ для съёмки'
         else:
             self.task_label.text = 'НЕТ ЗАДАНИЯ'
-            self.record_btn.background_color = GREEN_DIM
             self.hint_label.text = 'Отсканируйте QR-код для получения задания'
 
     def on_enter(self):
@@ -112,7 +112,7 @@ class ConfirmScreen(Screen):
     def _on_record(self, *args):
         try:
             app = App.get_running_app()
-            if app:
+            if app and app.current_task_id:
                 app.start_recording()
         except Exception as e:
             Logger.error(f"Record error: {e}")
@@ -138,5 +138,5 @@ class ConfirmScreen(Screen):
             app = App.get_running_app()
             if app:
                 app.on_request_close()
-        except Exception as e:
-            Logger.error(f"Close error: {e}")
+        except Exception:
+            App.get_running_app().stop()

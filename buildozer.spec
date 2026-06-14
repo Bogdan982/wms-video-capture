@@ -58,7 +58,7 @@ fullscreen = 1
 android.use_androidx = True
 
 # (list) Android permissions
-android.permissions = CAMERA, RECORD_AUDIO, INTERNET, WRITE_EXTERNAL_STORAGE, READ_EXTERNAL_STORAGE, FOREGROUND_SERVICE
+android.permissions = CAMERA, INTERNET, WRITE_EXTERNAL_STORAGE, READ_EXTERNAL_STORAGE, FOREGROUND_SERVICE
 
 # (list) Android extra API calls (для вызова системной камеры через Intent)
 android.api = 34
