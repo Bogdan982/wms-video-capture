@@ -240,9 +240,7 @@ class WmsVideoApp(App):
         self.logger.info("QR", "Запуск QR-сканера")
         self.app_status = 'scan'
         self.sm.current = 'scan'
-
-        # Запускаем сканер
-        Clock.schedule_once(lambda dt: self.qr.start_scan(), 0.5)
+        # QR сканер запускается вручную с экрана ScanScreen
 
     def on_scanner_unavailable(self):
         """QR-сканер не найден на устройстве — показываем сообщение на ScanScreen."""

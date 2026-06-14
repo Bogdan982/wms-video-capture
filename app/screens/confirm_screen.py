@@ -112,8 +112,14 @@ class ConfirmScreen(Screen):
     def _on_record(self, *args):
         try:
             app = App.get_running_app()
-            if app and app.current_task_id:
-                app.start_recording()
+            if not app:
+                return
+            # Если нет task_id — создаём временный
+            if not app.current_task_id:
+                import time
+                app.current_task_id = f'TEMP-{int(time.time())}'
+                self.task_label.text = f'ЗАДАЧА: {app.current_task_id}'
+            app.start_recording()
         except Exception as e:
             Logger.error(f"Record error: {e}")
 
