@@ -89,7 +89,7 @@ class ConfirmScreen(Screen):
         if app and app.current_task_id:
             self.task_label.text = f'ЗАДАЧА: {app.current_task_id}'
             self.record_btn.background_color = (0.2, 0.8, 0.2, 1)
-            self.record_btn.text = 'УДЕРЖИВАЙТЕ 2 СЕК'
+            self.record_btn.text = 'НАЧАТЬ ЗАПИСЬ'
             self.hint_label.text = 'Удерживайте кнопку для начала съёмки'
         else:
             self.task_label.text = 'НЕТ ЗАДАНИЯ'

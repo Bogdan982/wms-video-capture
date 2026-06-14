@@ -100,7 +100,7 @@ class SettingsScreen(Screen):
             self.pwd_input.text = ''
 
     def _add_field(self, label_text, value, on_change):
-        box = BoxLayout(orientation='horizontal', size_hint_y=None, height=40, spacing=4)
+        box = BoxLayout(orientation='horizontal', size_hint_y=None, height=48, spacing=4)
         box.add_widget(Label(text=label_text, font_size='13sp', color=GREEN_DIM,
                              size_hint_x=0.35, halign='right'))
         inp = TextInput(
@@ -149,7 +149,7 @@ class SettingsScreen(Screen):
                         lambda i, v: self._config.set('log_smb_share', v))
 
         # Смена пароля
-        pwd_box = BoxLayout(orientation='horizontal', size_hint_y=None, height=40, spacing=4)
+        pwd_box = BoxLayout(orientation='horizontal', size_hint_y=None, height=48, spacing=4)
         pwd_box.add_widget(Label(text='Новый пароль', font_size='13sp', color=GREEN_DIM,
                                  size_hint_x=0.35, halign='right'))
         new_pwd = TextInput(

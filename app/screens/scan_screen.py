@@ -94,4 +94,4 @@ class ScanScreen(Screen):
     def _go_back(self, *args):
         app = App.get_running_app()
         if app:
-            app.on_use_current_id()
+            app.sm.current = 'confirm'
