@@ -1,5 +1,5 @@
 """
-SplashScreen — терминальный стиль, программный.
+SplashScreen — русский, программный.
 """
 from kivy.uix.screenmanager import Screen
 from kivy.uix.boxlayout import BoxLayout
@@ -7,7 +7,10 @@ from kivy.uix.label import Label
 from kivy.clock import Clock
 from kivy.app import App
 from kivy.logger import Logger
-from app.theme import THEME_GREEN, THEME_GREEN_DIM, THEME_GRAY
+
+GREEN = (0.2, 1.0, 0.3, 1)
+GREEN_DIM = (0.15, 0.7, 0.2, 1)
+GRAY = (0.5, 0.5, 0.5, 1)
 
 
 class SplashScreen(Screen):
@@ -15,37 +18,41 @@ class SplashScreen(Screen):
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
-
-        layout = BoxLayout(orientation='vertical', padding=20, spacing=6)
+        layout = BoxLayout(orientation='vertical', padding=20, spacing=4)
 
         layout.add_widget(Label(size_hint_y=0.1))
 
-        for line in ['PROGRAMMA', 'AVTOMATIZACII', 'VIDEOFIXACII SKLADSKOGO', 'PROIZVODSTVA']:
+        lines = [
+            'ПРОГРАММА АВТОМАТИЗАЦИИ',
+            'ВИДЕОФИКСАЦИИ СКЛАДСКОГО',
+            'ПРОИЗВОДСТВА'
+        ]
+        for line in lines:
             layout.add_widget(Label(
-                text=line, font_size='18sp', bold=True,
-                color=THEME_GREEN, size_hint_y=0.07, halign='center'
+                text=line, font_size='16sp', bold=True,
+                color=GREEN, size_hint_y=0.07, halign='center'
             ))
 
-        layout.add_widget(Label(size_hint_y=0.08))
+        layout.add_widget(Label(size_hint_y=0.06))
 
         self.org_label = Label(
-            text='NAZVANIE ORGANIZACII',
-            font_size='24sp', bold=True,
-            color=THEME_GREEN_DIM, size_hint_y=0.15, halign='center'
+            text='НАЗВАНИЕ ОРГАНИЗАЦИИ',
+            font_size='22sp', bold=True,
+            color=GREEN_DIM, size_hint_y=0.14, halign='center'
         )
         layout.add_widget(self.org_label)
 
-        layout.add_widget(Label(size_hint_y=0.12))
+        layout.add_widget(Label(size_hint_y=0.1))
 
         layout.add_widget(Label(
             text='Roman design (c) 2025',
-            font_size='11sp', color=THEME_GRAY,
+            font_size='11sp', color=GRAY,
             size_hint_y=0.06, halign='center'
         ))
 
         layout.add_widget(Label(
             text='v1.0.0',
-            font_size='10sp', color=THEME_GREEN_DIM,
+            font_size='10sp', color=GREEN_DIM,
             size_hint_y=0.05, halign='center'
         ))
 
